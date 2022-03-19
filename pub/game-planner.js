@@ -122,16 +122,70 @@ GameRenderer.prototype = {
         flipPageSpan.appendChild(nextButton);
         optionBar.appendChild(flipPageSpan)
         
+        // main table
         if (this.showByWeeks == true) {
-            optionBar.appendChild(self._displayTableByWeeks(container));
+            optionBar.appendChild(self._displayTableByWeeks());
         }
         else if (this.showByWeeks == false) {
-            optionBar.appendChild(self._displayTableByMonths(container));
+            optionBar.appendChild(self._displayTableByMonths());
         }
+        gamePlannerDiv.appendChild(optionBar);
     },
 
-    _displayTableByWeeks: function(container) {
+    _filterEventsWithDays(date) {
+        let eventList = this.gamePlanner.events;
+
+    }
+    _displayTableByWeeks: function() {
         const gamePlanner = this.gamePlanner;
+        let mainTable = document.createElement('table');
+        let thread = document.createElement('thread');
+        let thread_tr = document.createElement('tr');
+        let th;
+        for (days of ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']){
+            th = document.createElement('th');
+            th.innerHTML = days;
+            thread_tr.appendChild(th);
+        }
+        thread.appendChild(thread_tr);
+        mainTable.appendChild(thread);
+
+        let tbody = document.createElemet('tbody');
+        body_tr = docuemnt.createElement('tr');
+        time_td = document.createElement('td');
+        let eventTime;
+        for (let i = 0; i < 48; i++) {
+            if (floor(i/2) == i/2){
+                eventTime = floor(i/2).toString + ':00';
+            } else {
+                eventTime = floor(i/2).toString + ':30';
+            }
+            timeDiv = document.createElement('div');
+            timeDiv.className = 'planner_time';
+            timeDiv.innerHTML = eventTime;
+            time_td.appendChild(timeDiv);
+        }
+        body_tr.appendChild(time_td);
+
+        for (let i = 0; i<7; i++) {
+            event_td = document.createElement('td');
+            event_td.className = 'events';
+            let date; //TODO: get dates
+            let event;
+            for (event of self._filterEventsWithDays(date)){
+                eventDiv = document.createElement('div');
+                eventDiv.className = 'event';
+                
+
+            }
+            body_tr.appendChild(event_td);
+        }
+    
+
+        
+
+
+        
         
 
     },
