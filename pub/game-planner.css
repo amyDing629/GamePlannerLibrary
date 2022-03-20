@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barriecito&family=Noto+Serif+Display:ital@1&display=swap');
+
+
+#planner-title {
+    margin-top:20px;
+    margin-left:20px;
+    margin-bottom: 20px;
+    font-style:oblique;
+    
+}
+
+#option-bar {
+    width: 1200px;
+    margin-left: 20px;
+
+}
+
+#display-option {
+
+}
+
+#time-range {
+    float: right;
+    font-weight: bold;
+
+}
+
+#flip-page {
+    margin-left: 30px;
+    float: right;
+
+}
+
+#filterButtons {
+    margin-left: 330px;
+    margin-bottom: 10px;
+}
+
+#filterDiv {
+
+
+}
+
+#filterDiv ul {
+    list-style: none;
+
+}
+
+#filterDiv ul li {
+
+}
+
+#main-table{
+    margin-top: 10px;
+    border: 1px solid;
+    table-layout: fixed;
+    width: 1200px;
+    border-collapse: collapse;
+    margin-left: 20px;
+}
+
+#main-table td{
+    border: 1px solid;
+    margin-left: 0px;
+    text-align: center;
+}
+
+#main-table th{
+    text-align: center;
+}
+
+#thead{
+
+}
+
+#tbody{
+
+}
+
+.planner_time{
+    height: 20px;
+
+}
+
+.events{
+
+
+}
+
+
+.event{
+    width: 145px;
+    overflow: auto;
+    border: 1px solid;
+    font-size: 50%;
+
+
+}
+
+
+.game-name{
+    font-weight:bold;
+
+}
+
+.game-type{
+
+}
+
+.game-location{
+
+}
+
+.players{
+
+}

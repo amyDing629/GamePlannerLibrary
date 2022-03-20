@@ -5,6 +5,8 @@ class Event {
         this.startTime = startTime;
         if ('duration' in options) {
             this.duration = options['duration'];
+        }else{
+            this.duration = 1;
         }
         if ('type' in options) {
             this.type = options['type'];
@@ -23,7 +25,6 @@ class Event {
 
 function GamePlanner() {
 	this.events = [];
-    this.filterVariables = ['NA', 'player'];
     this.numberOfEvents = 0;
     this.tableName = null;
 }
@@ -32,6 +33,7 @@ function GameRenderer(gamePlanner, container) {
 	if (!(gamePlanner instanceof GamePlanner)) {
 		throw new Error('Initialize renderer using a GamePlanner');
 	}
+    this.filterVariables = ['NA', 'player'];
     this.filteredEventList = gamePlanner.events;
     this.container = container;
 	this.gamePlanner = gamePlanner;
@@ -61,9 +63,15 @@ GamePlanner.prototype = {
             }
         }
     },
+};
 
+GameRenderer.prototype = {
     addFilterVariables: function(variables) {
-        this.filterVariables += variables;
+        for (variable of variables){
+            if (!this.filterVariables.includes(variable)){
+                this.filterVariables.push(variable);
+            }
+        }
     },
 
     removeFilterVariables: function(variables) {
@@ -73,23 +81,25 @@ GamePlanner.prototype = {
             }
         }
     },
-};
-
-GameRenderer.prototype = {
     _buildButtons: function() {
         this.weeksButton = document.createElement('button');
         this.weeksButton.innerHTML = 'Weeks';
+        this.weeksButton.className = "btn btn-outline-dark btn-sm";
         this.monthsButton = document.createElement('button');
         this.monthsButton.innerHTML = 'Months';
+        this.monthsButton.className = "btn btn-outline-dark btn-sm";
         this.filterButton = document.createElement('button');
         this.filterButton.innerHTML = 'filter';
-        this.filterButton.className = 'filter';
+        this.filterButton.className = 'filter btn btn-primary';
         this.addFilterButton = document.createElement('button');
         this.addFilterButton.innerHTML = 'add filter';
         this.addFilterButton.id = 'add-filter';
+        this.addFilterButton.className = 'btn btn-outline-primary btn-sm';
         this.lastButton = document.createElement('button');
+        this.lastButton.className = "btn btn-outline-dark btn-sm";
         this.lastButton.innerHTML = 'last';
         this.nextButton = document.createElement('button');
+        this.nextButton.className = "btn btn-outline-dark btn-sm";
         this.nextButton.innerHTML = 'next';
 
     },
@@ -107,7 +117,7 @@ GameRenderer.prototype = {
             this.filteredEventList = this.gamePlanner.events;
             let filterDiv = document.getElementById('filterDiv');
             let li;
-            for (li of filterDiv.children[2].children){
+            for (li of filterDiv.children[0].children){
                 let operationSelect = li.getElementsByClassName('filter-operation')[0];
                 let variableSelect = li.getElementsByClassName('filter-variable')[0];
                 let operation = operationSelect.options[operationSelect.selectedIndex].text;
@@ -121,7 +131,7 @@ GameRenderer.prototype = {
             
         });
         this.addFilterButton.addEventListener('click', () => {
-            let filterUl = document.getElementById('filterDiv').children[2];
+            let filterUl = document.getElementById('filterDiv').children[0];
             filterUl.appendChild(this._createFilterLi());
         });
         
@@ -289,7 +299,7 @@ GameRenderer.prototype = {
         let variableSelect = document.createElement('select');
         variableSelect.className = 'filter-variable';
         let filterVariable;
-        for (filterVariable of gamePlanner.filterVariables){
+        for (filterVariable of this.filterVariables){
             let filterOption = document.createElement('option');
             filterOption.innerHTML = filterVariable;
             variableSelect.appendChild(filterOption);
@@ -310,6 +320,16 @@ GameRenderer.prototype = {
         input.type = 'text';
         input.className = 'filter-input';
         filterLi.appendChild(input);
+        
+        let removeButton = document.createElement('button');
+        removeButton.className = 'filter-remove btn btn-outline-danger btn-sm';
+        removeButton.innerHTML = 'remove';
+        removeButton.addEventListener('click', (e) => {
+            //console.log(e.target.parentElement.parentElement);
+            e.target.parentElement.parentElement.removeChild(e.target.parentElement);
+        });
+
+        filterLi.appendChild(removeButton);
         return filterLi;
 
     },
@@ -320,14 +340,28 @@ GameRenderer.prototype = {
             throw new Error('GamePlanner container not found');
         }
         const gamePlannerDiv = document.createElement('div');
-        gamePlannerDiv.className = 'game-planner';
+        gamePlannerDiv.id = 'game-planner';
 
         // title
         let gamePlannerTitle = document.createElement('h3');
-        gamePlannerTitle.className = 'planner-title';
+        gamePlannerTitle.id = 'planner-title';
         gamePlannerTitle.innerHTML = gamePlanner.tableName;
         gamePlannerDiv.appendChild(gamePlannerTitle);
+
+        // filter bar
+        filterDiv = document.createElement('div');
+        filterDiv.id = 'filterDiv';
+        filterUl = document.createElement('ul');
+        filterUl.appendChild(this._createFilterLi())
         
+        filterButtonsDiv = document.createElement('div');
+        filterButtonsDiv.id = 'filterButtons';
+        filterButtonsDiv.appendChild(this.addFilterButton);
+        filterButtonsDiv.appendChild(this.filterButton);
+        filterDiv.appendChild(filterUl); 
+        filterDiv.appendChild(filterButtonsDiv);
+        gamePlannerDiv.appendChild(filterDiv);
+
         // option bar
         let optionBar = document.createElement('div');
         optionBar.id = 'option-bar';
@@ -338,29 +372,19 @@ GameRenderer.prototype = {
         displayOption.appendChild(this.monthsButton);
         optionBar.appendChild(displayOption);
 
-        let timeRangeSpan = document.createElement('span');
-        timeRangeSpan.id = 'time-range';
-        timeRangeSpan.innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
-        optionBar.appendChild(timeRangeSpan);
-
         let flipPageSpan = document.createElement('span');
         flipPageSpan.id = 'flip-page';
         
         flipPageSpan.appendChild(this.lastButton);
         flipPageSpan.appendChild(this.nextButton);
         optionBar.appendChild(flipPageSpan)
-        gamePlannerDiv.appendChild(optionBar);
 
-        // filter bar
-        filterDiv = document.createElement('div');
-        filterDiv.id = 'filterDiv';
-        filterDiv.appendChild(this.filterButton);
-        filterDiv.appendChild(this.addFilterButton);
-        filterUl = document.createElement('ul');
-        filterUl.appendChild(this._createFilterLi())
-        
-        filterDiv.appendChild(filterUl);
-        gamePlannerDiv.appendChild(filterDiv);
+        let timeRangeSpan = document.createElement('span');
+        timeRangeSpan.id = 'time-range';
+        timeRangeSpan.innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
+        optionBar.appendChild(timeRangeSpan);
+
+        gamePlannerDiv.appendChild(optionBar);
 
         // main table
         if (this.showByWeeks == true) {
@@ -387,18 +411,21 @@ GameRenderer.prototype = {
     _displayTableByWeeks: function() {
         const gamePlanner = this.gamePlanner;
         let mainTable = document.createElement('table');
-        let thread = document.createElement('thread');
-        let thread_tr = document.createElement('tr');
+        mainTable.id = 'main-table';
+        let thead = document.createElement('thead');
+        thead.id = 'thead';
+        let thead_tr = document.createElement('tr');
         let th;
         for (days of ['', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']){
             th = document.createElement('th');
             th.innerHTML = days;
-            thread_tr.appendChild(th);
+            thead_tr.appendChild(th);
         }
-        thread.appendChild(thread_tr);
-        mainTable.appendChild(thread);
+        thead.appendChild(thead_tr);
+        mainTable.appendChild(thead);
 
         let tbody = document.createElement('tbody');
+        tbody.id = 'tbody';
         body_tr = document.createElement('tr');
         time_td = document.createElement('td');
         let eventTime;
@@ -424,26 +451,32 @@ GameRenderer.prototype = {
             for (event of this._filterEventsWithDate(date)){
                 eventDiv = document.createElement('div');
                 eventDiv.className = 'event';
+                
+                players_h6 = document.createElement('h6');
+                players_h6.className = 'players';
+                players_h6.innerHTML = event.player1 + ' VS ' + event.player2;
+                eventDiv.appendChild(players_h6);
 
-                name_h3 = document.createElement('h3');
-                name_h3.className = 'game-name';
-                name_h3.innerHTML = event.gamename;
-                eventDiv.appendChild(name_h3);
+                if (event.gamename != null){
+                    name_h6 = document.createElement('h6');
+                    name_h6.className = 'game-name';
+                    name_h6.innerHTML = event.gamename;
+                    eventDiv.appendChild(name_h6);
+                }
 
-                type_h4 = document.createElement('h4');
-                type_h4.className = 'game-type';
-                type_h4.innerHTML = event.type;
-                eventDiv.appendChild(type_h4);
+                if (event.type != null){
+                    type_h6 = document.createElement('h6');
+                    type_h6.className = 'game-type';
+                    type_h6.innerHTML = event.type;
+                    eventDiv.appendChild(type_h6);
+                }
 
-                location_h4 = document.createElement('h4');
-                location_h4.className = 'game-location';
-                location_h4.innerHTML = event.location;
-                eventDiv.appendChild(location_h4);
-
-                players_h4 = document.createElement('h4');
-                players_h4.className = 'players';
-                players_h4.innerHTML = event.player1 + ' VS ' + event.player2;
-                eventDiv.appendChild(players_h4);
+                if (event.location != null){
+                    location_h6 = document.createElement('h6');
+                    location_h6.className = 'game-location';
+                    location_h6.innerHTML = event.location;
+                    eventDiv.appendChild(location_h6);
+                }   
 
                 event_td.appendChild(eventDiv);
             }
