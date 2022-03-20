@@ -23,20 +23,24 @@ class Event {
 
 function GamePlanner() {
 	this.events = [];
-    this.filterVariables = ['player', 'time'];
+    this.filterVariables = ['NA', 'player', 'time'];
     this.numberOfEvents = 0;
     this.tableName = null;
 }
 
-function GameRenderer(gamePlanner) {
+function GameRenderer(gamePlanner, container) {
 	if (!(gamePlanner instanceof GamePlanner)) {
 		throw new Error('Initialize renderer using a GamePlanner');
 	}
+    this.container = container;
 	this.gamePlanner = gamePlanner;
     this.showByWeeks = true;
     let currentDate = new Date();
     // current week/month
     this.startDate = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()))
+    this._buildButtons();
+    this._bindEvents();
+
 };
 
 GamePlanner.prototype = {
@@ -71,13 +75,68 @@ GamePlanner.prototype = {
 };
 
 GameRenderer.prototype = {
+    _buildButtons: function() {
+        this.weeksButton = document.createElement('button');
+        this.weeksButton.innerHTML = 'Weeks';
+        this.monthsButton = document.createElement('button');
+        this.monthsButton.innerHTML = 'Months';
+        this.filterButton = document.createElement('button');
+        this.filterButton.innerHTML = 'filter';
+        this.filterButton.id = 'filter';
+        this.lastButton = document.createElement('button');
+        this.lastButton.innerHTML = 'last';
+        this.nextButton = document.createElement('button');
+        this.nextButton.innerHTML = 'next';
+
+    },
+
+    _bindEvents: function() {
+        this.weeksButton.addEventListener('click', () => {
+            this.showByWeeks = true;
+            this.display();
+        });
+        this.monthsButton.addEventListener('click', () => {
+            this.showByWeeks = false;
+            this.display();
+        });
+        this.filterButton.addEventListener('click', this.filterOnClick);
+        this.lastButton.addEventListener('click', () => {
+            if (this.showByWeeks == true) {
+                console.log(this.startDate);
+                this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() - 7));
+                console.log(this.startDate);
+            } 
+            // TODO for beta phase.
+            // else {
+            // }
+            this.display();
+        })
+        this.nextButton.addEventListener('click', () => {
+            if (this.showByWeeks == true) {
+                console.log(this.startDate);
+                this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() + 7));
+                console.log(this.startDate);
+            } 
+            // TODO for beta phase.
+            // else {
+            // }
+            this.display();
+        })
+
+    },
+
+    _filterOnClick: function() {
+        let w = window.open("");
+        w.document.writeln("popup-window");
+    },
+
     setTableType: function(showByWeeks) {
         this.showByWeeks = showByWeeks;
     },
 
-    display: function(container) {
+    display: function() {
         const gamePlanner = this.gamePlanner;
-        if (container == null) {
+        if (this.container == null) {
             throw new Error('GamePlanner container not found');
         }
         const gamePlannerDiv = document.createElement('div');
@@ -95,18 +154,9 @@ GameRenderer.prototype = {
 
         let displayOption = document.createElement('span');
         displayOption.id = 'display-option';
-        let weeksButton = document.createElement('button');
-        weeksButton.innerHTML = 'Weeks';
-        let monthsButton = document.createElement('button');
-        monthsButton.innerHTML = 'Months';
-        displayOption.appendChild(weeksButton);
-        displayOption.appendChild(monthsButton);
+        displayOption.appendChild(this.weeksButton);
+        displayOption.appendChild(this.monthsButton);
         optionBar.appendChild(displayOption);
-
-        let filterButton = document.createElement('button');
-        filterButton.id = 'filter';
-        filterButton.innerHTML = 'filter';
-        optionBar.appendChild(filterButton);
 
         let timeRangeSpan = document.createElement('span');
         timeRangeSpan.id = 'time-range';
@@ -115,14 +165,46 @@ GameRenderer.prototype = {
 
         let flipPageSpan = document.createElement('span');
         flipPageSpan.id = 'flip-page';
-        lastButton = document.createElement('button');
-        lastButton.innerHTML = 'last';
-        nextButton = document.createElement('button');
-        nextButton.innerHTML = 'next';
-        flipPageSpan.appendChild(lastButton);
-        flipPageSpan.appendChild(nextButton);
+        
+        flipPageSpan.appendChild(this.lastButton);
+        flipPageSpan.appendChild(this.nextButton);
         optionBar.appendChild(flipPageSpan)
         gamePlannerDiv.appendChild(optionBar);
+
+        // filter bar
+        filterDiv = document.createElement('div');
+        filterDiv.id = 'filter';
+        
+        filterDescription = document.createElement('span');
+        filterDescription.innerHTML = 'filter your events here';
+        variableSelect = document.createElement('select');
+        variableSelect.id = 'filter-variable';
+        let filterVariable;
+        for (filterVariable of gamePlanner.filterVariables){
+            let filterOption = document.createElement('option');
+            filterOption.innerHTML = filterVariable;
+            variableSelect.appendChild(filterOption);
+        }
+        filterDiv.appendChild(variableSelect);
+
+        operationSelect = document.createElement('select');
+        operationSelect.id = 'filter-operation';
+        let operation;
+        for (operation of ['NA', 'exists', 'is', 'is not']){
+            let operationOption = document.createElement('option');
+            operationOption.innerHTML = operation;
+            operationSelect.appendChild(operationOption);
+        }
+        filterDiv.appendChild(operationSelect);
+
+        let input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'filter-input';
+        filterDiv.appendChild(input);
+
+        filterDiv.appendChild(this.filterButton);
+        gamePlannerDiv.appendChild(filterDiv);
+
         // main table
         if (this.showByWeeks == true) {
             gamePlannerDiv.appendChild(this._displayTableByWeeks());
@@ -130,11 +212,12 @@ GameRenderer.prototype = {
         else if (this.showByWeeks == false) {
             gamePlannerDiv.appendChild(this._displayTableByMonths());
         }
-        container.appendChild(gamePlannerDiv);
+        this.container.innerHTML = ''; //clear everything
+        this.container.appendChild(gamePlannerDiv);
+        console.log(gamePlannerDiv);
     },
 
     _filterEventsWithDate: function(date) {
-        console.log(date);
         let eventList = this.gamePlanner.events;
         let event;
         let result = [];
@@ -180,14 +263,9 @@ GameRenderer.prototype = {
         for (let i = 0; i<7; i++) {
             event_td = document.createElement('td');
             event_td.className = 'events';
-            console.log(this.startDate);
-            let date;
-            if (i == 0){
-                date = this.startDate;
-            }else{
-                date = new Date(this.startDate.setDate(this.startDate.getDate() + 1));
-            }
-            
+            let date = new Date(this.startDate);
+            date = new Date(date.setDate(date.getDate() + i));
+            console.log(date);
             let event;
             for (event of this._filterEventsWithDate(date)){
                 eventDiv = document.createElement('div');
@@ -219,13 +297,14 @@ GameRenderer.prototype = {
         } 
         tbody.appendChild(body_tr);
         mainTable.appendChild(tbody);   
-        console.log(mainTable); 
         return mainTable; 
 
     },
 
     _displayTableByMonths: function(container) {
-        // TODO: for beta phase
+        let h3 = document.createElement('h3');
+        h3.innerHTML = 'Not Implemented For Alpha Phase.';
+        return h3;
     }
 }
 
