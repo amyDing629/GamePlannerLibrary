@@ -58,6 +58,7 @@
     width: 1200px;
     border-collapse: collapse;
     margin-left: 20px;
+    height: 720;
 }
 
 #main-table td{
@@ -79,7 +80,7 @@
 }
 
 .planner_time{
-    height: 20px;
+    height: 30px;
 
 }
 

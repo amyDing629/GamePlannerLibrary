@@ -429,12 +429,13 @@ GameRenderer.prototype = {
         body_tr = document.createElement('tr');
         time_td = document.createElement('td');
         let eventTime;
-        for (let i = 0; i < 48; i++) {
-            if (Math.floor(i/2) == i/2){
-                eventTime = Math.floor(i/2).toString() + ':00';
-            } else {
-                eventTime = Math.floor(i/2).toString() + ':30';
-            }
+        for (let i = 0; i < 24; i++) {
+            // if (Math.floor(i/2) == i/2){
+            //     eventTime = Math.floor(i/2).toString() + ':00';
+            // } else {
+            //     eventTime = Math.floor(i/2).toString() + ':30';
+            // }
+            eventTime = i.toString() + ':00';
             timeDiv = document.createElement('div');
             timeDiv.className = 'planner_time';
             timeDiv.innerHTML = eventTime;
@@ -451,7 +452,10 @@ GameRenderer.prototype = {
             for (event of this._filterEventsWithDate(date)){
                 eventDiv = document.createElement('div');
                 eventDiv.className = 'event';
-                
+                eventDiv.style.setProperty('position', 'absolute');
+                eventDiv.style = "margin-top:" + 30*parseInt(event.startTime.getHours()).toString() + "px; ";
+                //eventDiv.style = height:" + (30*event.duration).toString() + ;
+                eventDiv.style.setProperty('height', (30*event.duration).toString() + 'px');
                 players_h6 = document.createElement('h6');
                 players_h6.className = 'players';
                 players_h6.innerHTML = event.player1 + ' VS ' + event.player2;
