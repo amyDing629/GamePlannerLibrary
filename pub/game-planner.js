@@ -250,18 +250,18 @@ GameRenderer.prototype = {
                     result_list.push(event);
                 }
             }
-            else if (variable != 'location') {
-                if (event.location == value){
+            else if (variable == 'location') {
+                if (event.location != value){
                     result_list.push(event);
                 }
             }
-            else if (variable != 'result') {
-                if (event.result == value){
+            else if (variable == 'result') {
+                if (event.result != value){
                     result_list.push(event);
                 }
             }
-            else if (variable != 'gamename') {
-                if (event.gamename == value){
+            else if (variable == 'gamename') {
+                if (event.gamename != value){
                     result_list.push(event);
                 }
             }
