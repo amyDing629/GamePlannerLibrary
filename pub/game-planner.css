@@ -16,10 +16,6 @@
 
 }
 
-#display-option {
-
-}
-
 #time-range {
     float: right;
     font-weight: bold;
@@ -37,17 +33,8 @@
     margin-bottom: 10px;
 }
 
-#filterDiv {
-
-
-}
-
 #filterDiv ul {
     list-style: none;
-
-}
-
-#filterDiv ul li {
 
 }
 
@@ -71,24 +58,10 @@
     text-align: center;
 }
 
-#thead{
-
-}
-
-#tbody{
-
-}
-
 .planner_time{
     height: 30px;
 
 }
-
-.events{
-
-
-}
-
 
 .event{
     width: 145px;
@@ -102,17 +75,5 @@
 
 .game-name{
     font-weight:bold;
-
-}
-
-.game-type{
-
-}
-
-.game-location{
-
-}
-
-.players{
 
 }
