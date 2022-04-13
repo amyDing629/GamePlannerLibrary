@@ -11,7 +11,7 @@
 }
 
 #option-bar {
-    width: 1200px;
+    width: 1000px;
     margin-left: 20px;
 
 }
@@ -42,10 +42,11 @@
     margin-top: 10px;
     border: 1px solid;
     table-layout: fixed;
-    width: 1200px;
+    width: 1000px;
     border-collapse: collapse;
     margin-left: 20px;
     height: 720;
+    margin-bottom: 20px;
 }
 
 #main-table td{
@@ -56,19 +57,22 @@
 
 #main-table th{
     text-align: center;
+    border-collapse: collapse;
 }
 
 .planner_time{
     height: 30px;
 
 }
+.event_block{
+    height: 30px;
+}
 
 .event{
-    width: 145px;
+    width: 125px;
     overflow: auto;
     border: 1px solid;
     font-size: 50%;
-
 
 }
 

@@ -40,7 +40,12 @@ function GameRenderer(gamePlanner, container) {
     this.showByWeeks = true;
     let currentDate = new Date();
     // current week/month
-    this.startDate = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()))
+    if (this.showByWeeks == true){
+        this.startDate = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()))
+    } else {
+        this.startDate = currentDate;
+    }
+    
     this._buildButtons();
     this._bindEvents();
 
@@ -67,6 +72,7 @@ GamePlanner.prototype = {
 
 GameRenderer.prototype = {
     addFilterVariables: function(variables) {
+        let variable;
         for (variable of variables){
             if (!this.filterVariables.includes(variable)){
                 this.filterVariables.push(variable);
@@ -75,6 +81,7 @@ GameRenderer.prototype = {
     },
 
     removeFilterVariables: function(variables) {
+        let variable;
         for (variable of variables) {
             if (this.filterVariables.includes(variable)){
                 this.filterVariables.remove(variable);
@@ -85,9 +92,9 @@ GameRenderer.prototype = {
         this.weeksButton = document.createElement('button');
         this.weeksButton.innerHTML = 'Weeks';
         this.weeksButton.className = "btn btn-outline-dark btn-sm";
-        this.monthsButton = document.createElement('button');
-        this.monthsButton.innerHTML = 'Months';
-        this.monthsButton.className = "btn btn-outline-dark btn-sm";
+        this.daysButton = document.createElement('button');
+        this.daysButton.innerHTML = 'Days';
+        this.daysButton.className = "btn btn-outline-dark btn-sm";
         this.filterButton = document.createElement('button');
         this.filterButton.innerHTML = 'filter';
         this.filterButton.className = 'filter btn btn-primary';
@@ -107,10 +114,15 @@ GameRenderer.prototype = {
     _bindEvents: function() {
         this.weeksButton.addEventListener('click', () => {
             this.showByWeeks = true;
+            document.getElementById('game-planner').removeChild(document.getElementById('game-planner').lastChild);
+            let currentDate = new Date();
+            this.startDate = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
             this.display();
         });
-        this.monthsButton.addEventListener('click', () => {
+        this.daysButton.addEventListener('click', () => {
             this.showByWeeks = false;
+            document.getElementById('game-planner').removeChild(document.getElementById('game-planner').lastChild);
+            this.startDate = new Date();
             this.display();
         });
         this.filterButton.addEventListener('click', () => {
@@ -140,8 +152,10 @@ GameRenderer.prototype = {
                 this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() - 7));
             } 
             // TODO for beta phase.
-            // else {
-            // }
+            else {
+                this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() - 1));
+            }
+            
             this.display();
         });
         this.nextButton.addEventListener('click', () => {
@@ -149,8 +163,9 @@ GameRenderer.prototype = {
                 this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() + 7));
             } 
             // TODO for beta phase.
-            // else {
-            // }
+            else {
+                this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() + 1));
+            }
             this.display();
         });
 
@@ -158,6 +173,7 @@ GameRenderer.prototype = {
 
     _eventExists: function(variable, value){
         let result_list = [];
+        let event;
         for (event of this.filteredEventList){
             if (variable == 'player') {
                 if (event.player1 != null && event.player2 != null){
@@ -196,6 +212,7 @@ GameRenderer.prototype = {
 
     _eventIs: function(variable, value){
         let result_list = [];
+        let event;
         for (event of this.filteredEventList){
             if (variable == 'player') {
                 if (event.player1 == value || event.player2 == value){
@@ -234,6 +251,7 @@ GameRenderer.prototype = {
 
     _eventIsNot: function(variable, value){
         let result_list = [];
+        let event;
         for (event of this.filteredEventList){
             if (variable == 'player') {
                 if (event.player1 != value && event.player2 != value){
@@ -271,7 +289,6 @@ GameRenderer.prototype = {
     },
 
     _filterEvents: function(variable, value, operation){
-        let result_list = [];
         let event;
         for (event of this.filteredEventList){
             console.log(this.filteredEventList);
@@ -369,7 +386,7 @@ GameRenderer.prototype = {
         let displayOption = document.createElement('span');
         displayOption.id = 'display-option';
         displayOption.appendChild(this.weeksButton);
-        displayOption.appendChild(this.monthsButton);
+        displayOption.appendChild(this.daysButton);
         optionBar.appendChild(displayOption);
 
         let flipPageSpan = document.createElement('span');
@@ -381,6 +398,7 @@ GameRenderer.prototype = {
 
         let timeRangeSpan = document.createElement('span');
         timeRangeSpan.id = 'time-range';
+        console.log(this.startDate);
         timeRangeSpan.innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
         optionBar.appendChild(timeRangeSpan);
 
@@ -391,7 +409,7 @@ GameRenderer.prototype = {
             gamePlannerDiv.appendChild(this._displayTableByWeeks());
         }
         else if (this.showByWeeks == false) {
-            gamePlannerDiv.appendChild(this._displayTableByMonths());
+            gamePlannerDiv.appendChild(this._displayTableByDays());
         }
         this.container.innerHTML = ''; //clear everything
         this.container.appendChild(gamePlannerDiv);
@@ -409,7 +427,6 @@ GameRenderer.prototype = {
     },
 
     _displayTableByWeeks: function() {
-        const gamePlanner = this.gamePlanner;
         let mainTable = document.createElement('table');
         mainTable.id = 'main-table';
         let thead = document.createElement('thead');
@@ -426,76 +443,129 @@ GameRenderer.prototype = {
 
         let tbody = document.createElement('tbody');
         tbody.id = 'tbody';
-        body_tr = document.createElement('tr');
-        time_td = document.createElement('td');
-        let eventTime;
         for (let i = 0; i < 24; i++) {
-            // if (Math.floor(i/2) == i/2){
-            //     eventTime = Math.floor(i/2).toString() + ':00';
-            // } else {
-            //     eventTime = Math.floor(i/2).toString() + ':30';
-            // }
+            body_tr = document.createElement('tr');
+            time_td = document.createElement('td');
+            let eventTime;
             eventTime = i.toString() + ':00';
             timeDiv = document.createElement('div');
             timeDiv.className = 'planner_time';
             timeDiv.innerHTML = eventTime;
             time_td.appendChild(timeDiv);
-        }
-        body_tr.appendChild(time_td);
-
-        for (let i = 0; i<7; i++) {
-            event_td = document.createElement('td');
-            event_td.className = 'events';
-            let date = new Date(this.startDate);
-            date = new Date(date.setDate(date.getDate() + i));
-            let event;
-            for (event of this._filterEventsWithDate(date)){
-                eventDiv = document.createElement('div');
-                eventDiv.className = 'event';
-                eventDiv.style.setProperty('position', 'absolute');
-                eventDiv.style = "margin-top:" + 30*parseInt(event.startTime.getHours()).toString() + "px; ";
-                //eventDiv.style = height:" + (30*event.duration).toString() + ;
-                eventDiv.style.setProperty('height', (30*event.duration).toString() + 'px');
-                players_h6 = document.createElement('h6');
-                players_h6.className = 'players';
-                players_h6.innerHTML = event.player1 + ' VS ' + event.player2;
-                eventDiv.appendChild(players_h6);
-
-                if (event.gamename != null){
-                    name_h6 = document.createElement('h6');
-                    name_h6.className = 'game-name';
-                    name_h6.innerHTML = event.gamename;
-                    eventDiv.appendChild(name_h6);
-                }
-
-                if (event.type != null){
-                    type_h6 = document.createElement('h6');
-                    type_h6.className = 'game-type';
-                    type_h6.innerHTML = event.type;
-                    eventDiv.appendChild(type_h6);
-                }
-
-                if (event.location != null){
-                    location_h6 = document.createElement('h6');
-                    location_h6.className = 'game-location';
-                    location_h6.innerHTML = event.location;
-                    eventDiv.appendChild(location_h6);
-                }   
-
-                event_td.appendChild(eventDiv);
+            body_tr.appendChild(time_td);
+            for (let i = 0; i<7; i++) {
+                eventBlock_td = document.createElement('td');
+                eventBlock_td.className = 'events';
+                body_tr.appendChild(eventBlock_td);
             }
-            body_tr.appendChild(event_td);
-        } 
-        tbody.appendChild(body_tr);
+            tbody.appendChild(body_tr);
+        }
+
+        // loop a week's date and check if there's event on that day and display.
+    //     for (let i = 0; i<7; i++) {
+    //         eventBlock_td = document.createElement('td');
+    //         eventBlock_td.className = 'events';
+    //         for (let i = 0; i < 24; i++) {
+    //             eventBlockDiv = document.createElement('div');
+    //             eventBlockDiv.className = 'event_block';
+    //             eventBlock_td.appendChild(eventBlockDiv);      
+    //         }
+    //         body_tr.appendChild(eventBlock_td);
+    //         let date = new Date(this.startDate);
+    //         date = new Date(date.setDate(date.getDate() + i));
+    //         let event;
+    //         for (event of this._filterEventsWithDate(date)){
+    //             eventDiv = document.createElement('div');
+    //             eventDiv.className = 'event';
+    //             eventDiv.style.setProperty('position', 'absolute');
+    //             eventDiv.style = "margin-top:" + 30*parseInt(event.startTime.getHours()).toString() + "px; ";
+    //             //eventDiv.style = height:" + (30*event.duration).toString() + ;
+    //             eventDiv.style.setProperty('height', (30*event.duration).toString() + 'px');
+    //             players_h6 = document.createElement('h6');
+    //             players_h6.className = 'players';
+    //             players_h6.innerHTML = event.player1 + ' VS ' + event.player2;
+    //             eventDiv.appendChild(players_h6);
+
+    //             if (event.gamename != null){
+    //                 name_h6 = document.createElement('h6');
+    //                 name_h6.className = 'game-name';
+    //                 name_h6.innerHTML = event.gamename;
+    //                 eventDiv.appendChild(name_h6);
+    //             }
+
+    //             if (event.type != null){
+    //                 type_h6 = document.createElement('h6');
+    //                 type_h6.className = 'game-type';
+    //                 type_h6.innerHTML = event.type;
+    //                 eventDiv.appendChild(type_h6);
+    //             }
+
+    //             if (event.location != null){
+    //                 location_h6 = document.createElement('h6');
+    //                 location_h6.className = 'game-location';
+    //                 location_h6.innerHTML = event.location;
+    //                 eventDiv.appendChild(location_h6);
+    //             }   
+
+    //             eventBlock_td.appendChild(eventDiv);
+    //         }
+            // body_tr.appendChild(eventBlock_td);
+    //     } 
         mainTable.appendChild(tbody);   
         return mainTable; 
 
     },
 
-    _displayTableByMonths: function(container) {
-        let h3 = document.createElement('h3');
-        h3.innerHTML = 'Not Implemented For Alpha Phase.';
-        return h3;
+    _sortEventsByTime: function(eventList) {
+        return eventList;
+    },
+
+    _displayTableByDays: function() {
+        const dayMainDiv = document.createElement('div');
+        let filterDateEvents = this._filterEventsWithDate(this.startDate);
+        let event;
+        for (event of filterDateEvents){
+            dayMainDiv.appendChild(this._displayEachEventDays(event));
+        }
+        return dayMainDiv;
+    },
+
+    _displayEachEventDays: function(event) {
+        let eventDivDay = document.createElement('div');
+        eventDivDay.className = 'event-day-div';
+        let playersDiv = document.createElement('div');
+        playersDiv.className = 'player-day-div';
+        playersDiv.innerHTML = event.player1 + ' VS ' + event.player2;
+        let timeDiv = document.createElement('div');
+        timeDiv.className = 'time-day-div';
+        timeDiv.innerHTML = event.startTime //+ ' ~ ' + (event.startTime.addHours(event.duration));
+        eventDivDay.append(playersDiv);
+        eventDivDay.append(timeDiv);
+        if (event.type) {
+            let typeDiv = document.createElement('div');
+            typeDiv.className = 'type-day-div';
+            typeDiv.innerHTML = event.type;
+            eventDivDay.append(typeDiv);
+        }
+        if (event.location) {
+            let locationDiv = document.createElement('div');
+            locationDiv.className = 'location-day-div';
+            locationDiv.innerHTML = event.location;
+            eventDivDay.append(locationDiv);
+        }
+        if (event.gamename) {
+            let gamenameDiv = document.createElement('div');
+            gamenameDiv.className = 'gamename-day-div';
+            gamenameDiv.innerHTML = event.gamename;
+            eventDivDay.append(gamenameDiv);
+        }
+        if (event.result) {
+            let resultDiv = document.createElement('div');
+            resultDiv.className = 'result-day-div';
+            resultDiv.innerHTML = event.result;
+            eventDivDay.append(resultDiv);
+        }
+        return eventDivDay;
     }
 }
 
