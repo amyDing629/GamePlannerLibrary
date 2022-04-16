@@ -16,9 +16,10 @@
 
 }
 
+
 #time-range {
-    float: right;
     font-weight: bold;
+    float: right;
 
 }
 
@@ -29,7 +30,7 @@
 }
 
 #filterButtons {
-    margin-left: 330px;
+    margin-left: 500px;
     margin-bottom: 10px;
 }
 
@@ -40,24 +41,35 @@
 
 #main-table{
     margin-top: 10px;
-    border: 1px solid;
+    outline: 1px solid;
     table-layout: fixed;
     width: 1000px;
     border-collapse: collapse;
     margin-left: 20px;
     height: 720;
     margin-bottom: 20px;
+    padding:0;
+    position: relative;
 }
 
 #main-table td{
-    border: 1px solid;
-    margin-left: 0px;
+    outline: 0.5px solid;
     text-align: center;
+    height: 30px;
+    padding:0;
 }
 
 #main-table th{
     text-align: center;
-    border-collapse: collapse;
+    /* border-collapse: collapse; */
+    width: 125px;
+    height: 30px;
+    padding:0;
+}
+
+#main-table tbody{
+    position: relative;
+    padding:0;
 }
 
 .planner_time{
@@ -66,18 +78,79 @@
 }
 .event_block{
     height: 30px;
+    width: 125px;
+    padding:0;
 }
 
 .event{
     width: 125px;
     overflow: auto;
-    border: 1px solid;
+    outline: 1px solid;
     font-size: 50%;
+    position: absolute;
+    background-color: rgb(210, 212, 244);
+    padding:0;
+    text-align: center;
+}
+
+.event-popup{
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    width: 400px;
+    height: 200px;
+    left: 300px;
+    top: 200px;
+    
+}
+
+.event-popup-word{
+    font-size: 200%;
+    font-family: cursive;
+    position: absolute;
+    left: 100px;
+    top: 50px;
+
+}
+
+.players{
+    margin-top: 10px;
+    font-size: 200%;
+    font-weight: bold;
 
 }
 
 
 .game-name{
-    font-weight:bold;
+    font-style:oblique;
 
+}
+
+.event-day-div{
+    margin-top: 30px;
+    margin-left: 170px;
+    width: 700px;
+    outline: 1px solid;
+
+}
+
+.filter-operation{
+    margin-right: 5px;
+    width: 100px;
+    height: 30px;
+}
+
+.filter-variable{
+    margin-right: 5px;
+    width: 200px;
+    height: 30px;
+}
+
+.filter-input{
+    margin-right: 20px;
+    width: 200px;
+    height: 30px;
+}
+
+#add-filter{
+    margin-right: 5px;
 }

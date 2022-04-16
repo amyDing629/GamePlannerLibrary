@@ -3,6 +3,7 @@ class Event {
         this.player1 = player1;
         this.player2 = player2;
         this.startTime = startTime;
+        this.eventID = eventID;
         if ('duration' in options) {
             this.duration = options['duration'];
         }else{
@@ -27,6 +28,8 @@ function GamePlanner() {
 	this.events = [];
     this.numberOfEvents = 0;
     this.tableName = null;
+    this.latestTime = null;
+    this.earliestTime = null;
 }
 
 function GameRenderer(gamePlanner, container) {
@@ -45,7 +48,7 @@ function GameRenderer(gamePlanner, container) {
     } else {
         this.startDate = currentDate;
     }
-    
+    this.filterStatus = [];
     this._buildButtons();
     this._bindEvents();
 
@@ -59,9 +62,16 @@ GamePlanner.prototype = {
 	addEvent: function(player1, player2, time, options) {
         this.numberOfEvent += 1;
 		this.events.push(new Event(player1, player2, time, this.numberOfevents, options));
+        if (this.latestTime == null || time.getTime() > this.latestTime.getTime()) {
+            this.latestTime = time;
+        }
+        if (this.earliestTime == null || time.getTime() < this.earliestTime.getTime()) {
+            this.earliestTime = time;
+        }
 	},
 
     removeEvent: function(eventID) {
+        let event;
         for (event of this.events) {
             if (event.eventID == eventID) {
                 this.events.remove(event);
@@ -97,7 +107,7 @@ GameRenderer.prototype = {
         this.daysButton.className = "btn btn-outline-dark btn-sm";
         this.filterButton = document.createElement('button');
         this.filterButton.innerHTML = 'filter';
-        this.filterButton.className = 'filter btn btn-primary';
+        this.filterButton.className = 'filter btn btn-primary btn';
         this.addFilterButton = document.createElement('button');
         this.addFilterButton.innerHTML = 'add filter';
         this.addFilterButton.id = 'add-filter';
@@ -114,20 +124,24 @@ GameRenderer.prototype = {
     _bindEvents: function() {
         this.weeksButton.addEventListener('click', () => {
             this.showByWeeks = true;
-            document.getElementById('game-planner').removeChild(document.getElementById('game-planner').lastChild);
             let currentDate = new Date();
             this.startDate = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
-            this.display();
+            // update main-table update
+            document.getElementById('time-range').innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
+            document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
         });
         this.daysButton.addEventListener('click', () => {
             this.showByWeeks = false;
-            document.getElementById('game-planner').removeChild(document.getElementById('game-planner').lastChild);
             this.startDate = new Date();
-            this.display();
+            document.getElementById('time-range').innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
+            document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            document.getElementById('game-planner').appendChild(this._displayTableByDays());
         });
         this.filterButton.addEventListener('click', () => {
             this.filteredEventList = this.gamePlanner.events;
             let filterDiv = document.getElementById('filterDiv');
+            this.filterStatus = [];
             let li;
             for (li of filterDiv.children[0].children){
                 let operationSelect = li.getElementsByClassName('filter-operation')[0];
@@ -139,7 +153,15 @@ GameRenderer.prototype = {
                     this._filterEvents(variable, value, operation);
                 }
             }
-            this.display();
+
+            // update main-table update
+            document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            if (this.showByWeeks == true) {
+                document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
+            }
+            else if (this.showByWeeks == false) {
+                document.getElementById('game-planner').appendChild(this._displayTableByDays());
+            }
             
         });
         this.addFilterButton.addEventListener('click', () => {
@@ -156,7 +178,16 @@ GameRenderer.prototype = {
                 this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() - 1));
             }
             
-            this.display();
+            document.getElementById('time-range').innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
+            // update main-table update
+            document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            if (this.showByWeeks == true) {
+                document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
+            }
+            else if (this.showByWeeks == false) {
+                document.getElementById('game-planner').appendChild(this._displayTableByDays());
+            }
+
         });
         this.nextButton.addEventListener('click', () => {
             if (this.showByWeeks == true) {
@@ -166,7 +197,16 @@ GameRenderer.prototype = {
             else {
                 this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() + 1));
             }
-            this.display();
+
+            document.getElementById('time-range').innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
+            // update main-table update
+            document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            if (this.showByWeeks == true) {
+                document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
+            }
+            else if (this.showByWeeks == false) {
+                document.getElementById('game-planner').appendChild(this._displayTableByDays());
+            }
         });
 
     },
@@ -289,9 +329,9 @@ GameRenderer.prototype = {
     },
 
     _filterEvents: function(variable, value, operation){
+        this.filterStatus.push([variable, value, operation]);
         let event;
         for (event of this.filteredEventList){
-            console.log(this.filteredEventList);
             if (operation == 'exists'){
                 this._eventExists(variable, value);
             }
@@ -309,7 +349,7 @@ GameRenderer.prototype = {
         this.showByWeeks = showByWeeks;
     },
 
-    _createFilterLi: function() {
+    _createFilterLi: function(filterEle) {
         let filterLi = document.createElement('li');
         let filterDescription = document.createElement('span');
         filterDescription.innerHTML = 'filter your events here';
@@ -347,8 +387,10 @@ GameRenderer.prototype = {
         });
 
         filterLi.appendChild(removeButton);
-        return filterLi;
 
+
+        return filterLi;
+        
     },
 
     display: function() {
@@ -366,10 +408,18 @@ GameRenderer.prototype = {
         gamePlannerDiv.appendChild(gamePlannerTitle);
 
         // filter bar
-        filterDiv = document.createElement('div');
+        let filterDiv = document.createElement('div');
         filterDiv.id = 'filterDiv';
-        filterUl = document.createElement('ul');
-        filterUl.appendChild(this._createFilterLi())
+        let filterUl = document.createElement('ul');
+        
+        if (this.filterStatus.length == 0){
+            filterUl.appendChild(this._createFilterLi(null));
+        }
+
+        let filterEle;
+        for (filterEle of this.filterStatus){
+            filterUl.appendChild(this._createFilterLi(filterEle));
+        }
         
         filterButtonsDiv = document.createElement('div');
         filterButtonsDiv.id = 'filterButtons';
@@ -398,7 +448,6 @@ GameRenderer.prototype = {
 
         let timeRangeSpan = document.createElement('span');
         timeRangeSpan.id = 'time-range';
-        console.log(this.startDate);
         timeRangeSpan.innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
         optionBar.appendChild(timeRangeSpan);
 
@@ -443,11 +492,11 @@ GameRenderer.prototype = {
 
         let tbody = document.createElement('tbody');
         tbody.id = 'tbody';
-        for (let i = 0; i < 24; i++) {
+        for (let j = 0; j < 24; j++) {
             body_tr = document.createElement('tr');
             time_td = document.createElement('td');
             let eventTime;
-            eventTime = i.toString() + ':00';
+            eventTime = j.toString() + ':00';
             timeDiv = document.createElement('div');
             timeDiv.className = 'planner_time';
             timeDiv.innerHTML = eventTime;
@@ -462,57 +511,56 @@ GameRenderer.prototype = {
         }
 
         // loop a week's date and check if there's event on that day and display.
-    //     for (let i = 0; i<7; i++) {
-    //         eventBlock_td = document.createElement('td');
-    //         eventBlock_td.className = 'events';
-    //         for (let i = 0; i < 24; i++) {
-    //             eventBlockDiv = document.createElement('div');
-    //             eventBlockDiv.className = 'event_block';
-    //             eventBlock_td.appendChild(eventBlockDiv);      
-    //         }
-    //         body_tr.appendChild(eventBlock_td);
-    //         let date = new Date(this.startDate);
-    //         date = new Date(date.setDate(date.getDate() + i));
-    //         let event;
-    //         for (event of this._filterEventsWithDate(date)){
-    //             eventDiv = document.createElement('div');
-    //             eventDiv.className = 'event';
-    //             eventDiv.style.setProperty('position', 'absolute');
-    //             eventDiv.style = "margin-top:" + 30*parseInt(event.startTime.getHours()).toString() + "px; ";
-    //             //eventDiv.style = height:" + (30*event.duration).toString() + ;
-    //             eventDiv.style.setProperty('height', (30*event.duration).toString() + 'px');
-    //             players_h6 = document.createElement('h6');
-    //             players_h6.className = 'players';
-    //             players_h6.innerHTML = event.player1 + ' VS ' + event.player2;
-    //             eventDiv.appendChild(players_h6);
+        for (let j = 0; j<7; j++) {
+            let date = new Date(this.startDate);
+            date = new Date(date.setDate(date.getDate() + j));
+            let event;
+            for (event of this._filterEventsWithDate(date)){
+                eventDiv = document.createElement('div');
+                eventDiv.className = 'event';
+                eventDiv.style.setProperty('position', 'absolute');
+                eventDiv.style = "top:" + 30*parseInt(event.startTime.getHours()).toString() + "px; ";
+                //eventDiv.style = height:" + (30*event.duration).toString() + ;
+                eventDiv.style.setProperty('height', (30*event.duration).toString() + 'px');
+                eventDiv.style.setProperty('left', (125*(j+1)).toString() + 'px');
+                players_h6 = document.createElement('h6');
+                players_h6.className = 'players';
+                players_h6.innerHTML = event.player1 + '<br>VS<br>' + event.player2;
+                eventDiv.appendChild(players_h6);
 
-    //             if (event.gamename != null){
-    //                 name_h6 = document.createElement('h6');
-    //                 name_h6.className = 'game-name';
-    //                 name_h6.innerHTML = event.gamename;
-    //                 eventDiv.appendChild(name_h6);
-    //             }
+                if (event.gamename != null){
+                    name_h6 = document.createElement('h6');
+                    name_h6.className = 'game-name';
+                    name_h6.innerHTML = event.gamename;
+                    eventDiv.appendChild(name_h6);
+                }
 
-    //             if (event.type != null){
-    //                 type_h6 = document.createElement('h6');
-    //                 type_h6.className = 'game-type';
-    //                 type_h6.innerHTML = event.type;
-    //                 eventDiv.appendChild(type_h6);
-    //             }
+                tbody.appendChild(eventDiv);
+            }
+        } 
 
-    //             if (event.location != null){
-    //                 location_h6 = document.createElement('h6');
-    //                 location_h6.className = 'game-location';
-    //                 location_h6.innerHTML = event.location;
-    //                 eventDiv.appendChild(location_h6);
-    //             }   
-
-    //             eventBlock_td.appendChild(eventDiv);
-    //         }
-            // body_tr.appendChild(eventBlock_td);
-    //     } 
-        mainTable.appendChild(tbody);   
+        mainTable.appendChild(tbody);  
+        this._noEventNotif(mainTable);
         return mainTable; 
+
+    },
+
+    _noEventNotif: function(mainTable){
+        let popupEventNotif = document.createElement('div');
+        popupEventNotif.className = 'event-popup';
+        popupWordEvent = document.createElement('span');
+        popupWordEvent.className = 'event-popup-word'
+        popupEventNotif.appendChild(popupWordEvent);
+
+        if (this.startDate.getTime() > this.gamePlanner.latestTime.getTime()){
+            popupWordEvent.innerHTML = 'No Future Events';
+            mainTable.appendChild(popupEventNotif);
+        }
+        if (this.startDate.getTime() < this.gamePlanner.earliestTime.getTime()){
+            popupWordEvent.innerHTML = 'No Earlier Events';
+            mainTable.appendChild(popupEventNotif);
+        }
+
 
     },
 
@@ -522,11 +570,13 @@ GameRenderer.prototype = {
 
     _displayTableByDays: function() {
         const dayMainDiv = document.createElement('div');
+        dayMainDiv.id = 'main-table';
         let filterDateEvents = this._filterEventsWithDate(this.startDate);
         let event;
         for (event of filterDateEvents){
             dayMainDiv.appendChild(this._displayEachEventDays(event));
         }
+        this._noEventNotif(dayMainDiv);
         return dayMainDiv;
     },
 
