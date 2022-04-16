@@ -118,6 +118,10 @@ GameRenderer.prototype = {
         this.nextButton = document.createElement('button');
         this.nextButton.className = "btn btn-outline-dark btn-sm";
         this.nextButton.innerHTML = 'next';
+        this.timeInput = document.createElement('input');
+        this.timeInput.id = 'time-range';
+        this.timeInput.type = 'date';
+        this.timeInput.value = this.startDate.toISOString().split('T')[0];
 
     },
 
@@ -127,14 +131,14 @@ GameRenderer.prototype = {
             let currentDate = new Date();
             this.startDate = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
             // update main-table update
-            document.getElementById('time-range').innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
+            document.getElementById('time-range').value = this.startDate.toISOString().split('T')[0];
             document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
             document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
         });
         this.daysButton.addEventListener('click', () => {
             this.showByWeeks = false;
             this.startDate = new Date();
-            document.getElementById('time-range').innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
+            document.getElementById('time-range').value = this.startDate.toISOString().split('T')[0];
             document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
             document.getElementById('game-planner').appendChild(this._displayTableByDays());
         });
@@ -178,7 +182,7 @@ GameRenderer.prototype = {
                 this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() - 1));
             }
             
-            document.getElementById('time-range').innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
+            document.getElementById('time-range').value = this.startDate.toISOString().split('T')[0];
             // update main-table update
             document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
             if (this.showByWeeks == true) {
@@ -198,7 +202,7 @@ GameRenderer.prototype = {
                 this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() + 1));
             }
 
-            document.getElementById('time-range').innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
+            document.getElementById('time-range').value = this.startDate.toISOString().split('T')[0];
             // update main-table update
             document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
             if (this.showByWeeks == true) {
@@ -207,6 +211,21 @@ GameRenderer.prototype = {
             else if (this.showByWeeks == false) {
                 document.getElementById('game-planner').appendChild(this._displayTableByDays());
             }
+        });
+        this.timeInput.addEventListener('change', () => {
+            let changedTime = this.timeInput.value;
+            let selectedDate = new Date(changedTime);
+            this.startDate = new Date(selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay()));
+
+            document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            if (this.showByWeeks == true) {
+                document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
+                this.timeInput.value = this.startDate.toISOString().split('T')[0];
+            }
+            else if (this.showByWeeks == false) {
+                document.getElementById('game-planner').appendChild(this._displayTableByDays());
+            }
+
         });
 
     },
@@ -447,8 +466,9 @@ GameRenderer.prototype = {
         optionBar.appendChild(flipPageSpan)
 
         let timeRangeSpan = document.createElement('span');
-        timeRangeSpan.id = 'time-range';
-        timeRangeSpan.innerHTML = 'Starts From: ' + this.startDate.toISOString().split('T')[0];
+        timeRangeSpan.id = 'time-span';
+        timeRangeSpan.innerHTML = 'Starts From: ';
+        optionBar.appendChild(this.timeInput);
         optionBar.appendChild(timeRangeSpan);
 
         gamePlannerDiv.appendChild(optionBar);

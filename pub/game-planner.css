@@ -18,9 +18,14 @@
 
 
 #time-range {
-    font-weight: bold;
     float: right;
 
+}
+
+#time-span {
+    float: right;
+    margin-right: 10px;
+    font-size: 120%;
 }
 
 #flip-page {
