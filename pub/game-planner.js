@@ -7,7 +7,7 @@ class Event {
         if ('duration' in options) {
             this.duration = options['duration'];
         }else{
-            this.duration = 1;
+            this.duration = 5;
         }
         if ('type' in options) {
             this.type = options['type'];
@@ -25,6 +25,15 @@ class Event {
             this.color = options['color'];
         } else {
             this.color = '#E0FFFF';
+        }
+        if ('detail' in options){
+            this.detail = options['detail'];
+        }
+        if ('result' in options){
+            this.win = options['result']['win'];
+            if ('detail' in options['result']){
+                this.resultdetail = options['result']['detail'];
+            }
         }
     }
 }
@@ -127,24 +136,38 @@ GameRenderer.prototype = {
         this.timeInput.id = 'time-range';
         this.timeInput.type = 'date';
         this.timeInput.value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-
+        this.changeColorInput = document.createElement('input');
+        this.changeColorInput.id = "change-color-button";
+        this.changeColorInput.type = 'color';
+        this.resetButton = document.createElement('reset');
+        this.resetButton.id = 'reset';
+        this.resetButton.innerHTML = 'reset';
+        this.resetButton.className = 'btn btn-outline-success btn-sm'
     },
 
     _bindEvents: function() {
         this.weeksButton.addEventListener('click', () => {
             this.showByWeeks = true;
             let currentDate = new Date();
-            this.startDate = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay() - 1));
+            this.startDate = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
             // update main-table update
             document.getElementById('time-range').value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-            document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            if (document.getElementById('day-table')){
+                document.getElementById('game-planner').removeChild(document.getElementById('day-table'));
+            }else if (document.getElementById('main-table')){
+                document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            }
             document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
         });
         this.daysButton.addEventListener('click', () => {
             this.showByWeeks = false;
             this.startDate = new Date();
+            if (document.getElementById('day-table')){
+                document.getElementById('game-planner').removeChild(document.getElementById('day-table'));
+            }else if (document.getElementById('main-table')){
+                document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            }
             document.getElementById('time-range').value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-            document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
             document.getElementById('game-planner').appendChild(this._displayTableByDays());
         });
         this.filterButton.addEventListener('click', () => {
@@ -163,8 +186,12 @@ GameRenderer.prototype = {
                 }
             }
 
+            if (document.getElementById('day-table')){
+                document.getElementById('game-planner').removeChild(document.getElementById('day-table'));
+            }else if (document.getElementById('main-table')){
+                document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            }
             // update main-table update
-            document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
             if (this.showByWeeks == true) {
                 document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
             }
@@ -189,7 +216,13 @@ GameRenderer.prototype = {
             
             document.getElementById('time-range').value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
             // update main-table update
-            document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            
+            if (document.getElementById('day-table')){
+                document.getElementById('game-planner').removeChild(document.getElementById('day-table'));
+            }else if (document.getElementById('main-table')){
+                document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            }
+
             if (this.showByWeeks == true) {
                 document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
             }
@@ -202,14 +235,17 @@ GameRenderer.prototype = {
             if (this.showByWeeks == true) {
                 this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() + 7));
             } 
-            // TODO for beta phase.
             else {
                 this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() + 1));
             }
 
             document.getElementById('time-range').value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
             // update main-table update
-            document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            if (document.getElementById('day-table')){
+                document.getElementById('game-planner').removeChild(document.getElementById('day-table'));
+            }else if (document.getElementById('main-table')){
+                document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            }
             if (this.showByWeeks == true) {
                 document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
             }
@@ -219,10 +255,21 @@ GameRenderer.prototype = {
         });
         this.timeInput.addEventListener('change', () => {
             let changedTime = this.timeInput.value;
-            let selectedDate = new Date(changedTime);
-            this.startDate = new Date(selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay() - 1));
+            splittedTime = changedTime.split('-');
+            let selectedDate = new Date(splittedTime[0], splittedTime[1]-1, splittedTime[2]);
+            if (this.showByWeeks == true){
+                this.startDate = new Date(selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay()));
+            } else if (this.showByWeeks == false){
+                this.startDate = selectedDate;
+            }
+           
 
-            document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            if (document.getElementById('day-table')){
+                document.getElementById('game-planner').removeChild(document.getElementById('day-table'));
+            }else if (document.getElementById('main-table')){
+                document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+            }
+
             if (this.showByWeeks == true) {
                 document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
                 this.timeInput.value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
@@ -232,6 +279,36 @@ GameRenderer.prototype = {
             }
 
         });
+        this.changeColorInput.addEventListener('change', () => {
+            let changedColor = this.changeColorInput.value;
+            let event;
+            for (event of this.filteredEventList){
+                event.color = changedColor;
+            }
+
+            if (this.showByWeeks == true) {
+                if (document.getElementById('day-table')){
+                    document.getElementById('game-planner').removeChild(document.getElementById('day-table'));
+                }else if (document.getElementById('main-table')){
+                    document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+                }
+                document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
+                this.timeInput.value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+            }
+            else if (this.showByWeeks == false) {
+                if (document.getElementById('day-table')){
+                    document.getElementById('game-planner').removeChild(document.getElementById('day-table'));
+                }else if (document.getElementById('main-table')){
+                    document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
+                }
+                document.getElementById('game-planner').appendChild(this._displayTableByDays());
+            }
+
+        });
+        this.resetButton.addEventListener('click', () => {
+            this.filteredEventList = this.gamePlanner.events;
+            this.display();
+        })
 
     },
 
@@ -259,8 +336,18 @@ GameRenderer.prototype = {
                     result_list.push(event);
                 }
             }
-            else if (variable == 'result') {
-                if (event.result != null){
+            else if (variable == 'win') {
+                if (event.win != null){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'result-detail') {
+                if (event.resultdetail != null){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'detail') {
+                if (event.detail != null){
                     result_list.push(event);
                 }
             }
@@ -298,8 +385,18 @@ GameRenderer.prototype = {
                     result_list.push(event);
                 }
             }
-            else if (variable == 'result') {
-                if (event.result == value){
+            else if (variable == 'win') {
+                if (event.win == value){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'result-detail'){
+                if (event.resultdetail == value){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'detail'){
+                if (event.detail == value){
                     result_list.push(event);
                 }
             }
@@ -308,7 +405,6 @@ GameRenderer.prototype = {
                     result_list.push(event);
                 }
             }
-            //TODO: add more
         }
         this.filteredEventList = result_list;
     },
@@ -337,8 +433,18 @@ GameRenderer.prototype = {
                     result_list.push(event);
                 }
             }
-            else if (variable == 'result') {
-                if (event.result != value){
+            else if (variable == 'win') {
+                if (event.win != value){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'result-detail'){
+                if (event.resultdetail != value){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'detail'){
+                if (event.detail != value){
                     result_list.push(event);
                 }
             }
@@ -347,7 +453,6 @@ GameRenderer.prototype = {
                     result_list.push(event);
                 }
             }
-            //TODO: add more
         }
         this.filteredEventList = result_list;
     },
@@ -368,12 +473,11 @@ GameRenderer.prototype = {
         }
     },
 
-
     setTableType: function(showByWeeks) {
         this.showByWeeks = showByWeeks;
     },
 
-    _createFilterLi: function(filterEle) {
+    _createFilterLi: function() {
         let filterLi = document.createElement('li');
         let filterDescription = document.createElement('span');
         filterDescription.innerHTML = 'filter your events here';
@@ -446,6 +550,7 @@ GameRenderer.prototype = {
         
         filterButtonsDiv = document.createElement('div');
         filterButtonsDiv.id = 'filterButtons';
+        filterButtonsDiv.appendChild(this.resetButton);
         filterButtonsDiv.appendChild(this.addFilterButton);
         filterButtonsDiv.appendChild(this.filterButton);
         filterDiv.appendChild(filterUl); 
@@ -461,6 +566,12 @@ GameRenderer.prototype = {
         displayOption.appendChild(this.weeksButton);
         displayOption.appendChild(this.daysButton);
         optionBar.appendChild(displayOption);
+        let changeColorSpan = document.createElement('span');
+        changeColorSpan.id = 'change-color';
+        changeColorSpan.innerHTML = 'Change Color: ';
+        changeColorSpan.appendChild(this.changeColorInput);
+        optionBar.appendChild(changeColorSpan);
+
 
         let flipPageSpan = document.createElement('span');
         flipPageSpan.id = 'flip-page';
@@ -544,7 +655,6 @@ GameRenderer.prototype = {
                 eventDiv.className = 'event';
                 eventDiv.style.setProperty('position', 'absolute');
                 eventDiv.style = "top:" + 30*parseInt(event.startTime.getHours()).toString() + "px; ";
-                //eventDiv.style = height:" + (30*event.duration).toString() + ;
                 eventDiv.style.setProperty('height', (30*event.duration).toString() + 'px');
                 eventDiv.style.setProperty('left', (125*(j+1)).toString() + 'px');
                 eventDiv.style.setProperty('background-color', event.color);
@@ -576,32 +686,44 @@ GameRenderer.prototype = {
         popupWordEvent = document.createElement('span');
         popupWordEvent.className = 'event-popup-word'
         popupEventNotif.appendChild(popupWordEvent);
-
-        if (this.startDate.getTime() > this.gamePlanner.latestTime.getTime()){
+        
+        if (this.startDate.getTime() - 86400000 > this.gamePlanner.latestTime.getTime()){
             popupWordEvent.innerHTML = 'No Future Events';
             mainTable.appendChild(popupEventNotif);
+            return true;
         }
-        if (this.startDate.getTime() < this.gamePlanner.earliestTime.getTime()){
+        
+        if ((this.showByWeeks == true && this.startDate.getTime() +  86400000*7 < this.gamePlanner.earliestTime.getTime()) || (this.showByWeeks == false && this.startDate.getTime() + 86400000 < this.gamePlanner.earliestTime.getTime())){
             popupWordEvent.innerHTML = 'No Earlier Events';
             mainTable.appendChild(popupEventNotif);
+            return true
         }
-
+        return false;
 
     },
 
     _sortEventsByTime: function(eventList) {
-        return eventList;
+        return eventList.sort(function (a, b) {
+            return a.startTime.getTime() - b.startTime.getTime();
+          });
     },
 
     _displayTableByDays: function() {
         const dayMainDiv = document.createElement('div');
-        dayMainDiv.id = 'main-table';
+        dayMainDiv.id = 'day-table';
         let filterDateEvents = this._filterEventsWithDate(this.startDate);
+        let sortedByDateEvents = this._sortEventsByTime(filterDateEvents);
         let event;
-        for (event of filterDateEvents){
+        for (event of sortedByDateEvents){
             dayMainDiv.appendChild(this._displayEachEventDays(event));
         }
-        this._noEventNotif(dayMainDiv);
+        let appendResult = this._noEventNotif(dayMainDiv);
+        if (appendResult == false && sortedByDateEvents.length == 0){
+            let noDayEvent = document.createElement('div');
+            noDayEvent.innerHTML = "There is no event today";
+            noDayEvent.className = 'no-day-event';
+            dayMainDiv.appendChild(noDayEvent);
+        }
         return dayMainDiv;
     },
 
@@ -613,20 +735,23 @@ GameRenderer.prototype = {
         playersDiv.innerHTML = event.player1 + ' VS ' + event.player2;
         let timeDiv = document.createElement('div');
         timeDiv.className = 'time-day-div';
-        timeDiv.innerHTML = event.startTime //+ ' ~ ' + (event.startTime.addHours(event.duration));
-        eventDivDay.append(playersDiv);
+        eventStartTime = new Date(event.startTime.getTime() - (event.startTime.getTimezoneOffset() * 60000)).toISOString().split('T')[1].split('.')[0];
+        eventEndTime = new Date(event.startTime.getTime() + event.duration*3600000- (event.startTime.getTimezoneOffset() * 60000)).toISOString().split('T')[1].split('.')[0];
+        timeDiv.innerHTML = eventStartTime + '~' + eventEndTime;
         eventDivDay.append(timeDiv);
-        if (event.type) {
-            let typeDiv = document.createElement('div');
-            typeDiv.className = 'type-day-div';
-            typeDiv.innerHTML = event.type;
-            eventDivDay.append(typeDiv);
-        }
         if (event.location) {
             let locationDiv = document.createElement('div');
             locationDiv.className = 'location-day-div';
             locationDiv.innerHTML = event.location;
             eventDivDay.append(locationDiv);
+        }
+        eventDivDay.append(playersDiv);
+        
+        if (event.type) {
+            let typeDiv = document.createElement('div');
+            typeDiv.className = 'type-day-div';
+            typeDiv.innerHTML = event.type;
+            eventDivDay.append(typeDiv);
         }
         if (event.gamename) {
             let gamenameDiv = document.createElement('div');
@@ -634,13 +759,67 @@ GameRenderer.prototype = {
             gamenameDiv.innerHTML = event.gamename;
             eventDivDay.append(gamenameDiv);
         }
-        if (event.result) {
+        if (event.detail) {
+            let detailDiv = document.createElement('div');
+            detailDiv.className = 'detail-day-div';
+            detailButton = document.createElement('button');
+            detailButton.innerHTML = 'Event Details';
+            detailButton.className = 'event-detail-button btn btn-outline-dark btn-sm';
+            detailButton.addEventListener('click', () => {
+                this._createEventInfoPopup(false, event.detail, eventDivDay);
+            })
+            detailDiv.append(detailButton);
+            eventDivDay.append(detailDiv);
+
+        }
+        if (event.win) {
             let resultDiv = document.createElement('div');
             resultDiv.className = 'result-day-div';
-            resultDiv.innerHTML = event.result;
+            let resultSpan = document.createElement('span');
+            resultSpan.innerHTML = 'Winner: ' + event.win;
+            resultDiv.appendChild(resultSpan);
+            if (event.resultdetail) {
+                let resultDetailSpan = document.createElement('span');
+                let resultDetailButton = document.createElement('button');
+                resultDetailButton.innerHTML = 'Result Details';
+                resultDetailButton.className = 'result-detail-button btn btn-outline-dark btn-sm';
+                resultDetailButton.addEventListener('click', () => {
+                    this._createEventInfoPopup(true, event.resultdetail, eventDivDay);
+                })
+                resultDetailSpan.appendChild(resultDetailButton);
+                resultDiv.appendChild(resultDetailSpan);
+            }
             eventDivDay.append(resultDiv);
         }
+        eventDivDay.style.setProperty('background-color', event.color);
         return eventDivDay;
+    },
+
+    _createEventInfoPopup(isResult, content, parentElement){
+        let popupEventInfoDiv = document.createElement('div');
+        popupEventInfoDiv.id = 'popup-event-info';
+        let titleDiv = document.createElement('div');
+        titleDiv.className = 'popup-title';
+        if (isResult == true) {
+            titleDiv.innerHTML = 'Result Details:'
+        } else if (isResult == false) {
+            titleDiv.innerHTML = 'Event Details: '
+        }
+        let contentDiv = document.createElement('div');
+        contentDiv.className = 'popup-content';
+        contentDiv.innerHTML = content;
+        popupEventInfoDiv.appendChild(titleDiv);
+        popupEventInfoDiv.appendChild(contentDiv);
+
+        let closeButton = document.createElement('button');
+        closeButton.className = 'close-button btn btn-danger btn-sm';
+        closeButton.innerHTML = 'close';
+        closeButton.addEventListener('click', () => {
+            parentElement.removeChild(document.getElementById('popup-event-info'));
+        })
+        popupEventInfoDiv.appendChild(closeButton);
+
+        parentElement.appendChild(popupEventInfoDiv);
     }
 }
 
