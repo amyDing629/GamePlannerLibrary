@@ -21,6 +21,11 @@ class Event {
         if ('gamename' in options) {
             this.gamename = options['gamename'];
         }
+        if ('color' in options){
+            this.color = options['color'];
+        } else {
+            this.color = '#E0FFFF';
+        }
     }
 }
 
@@ -121,7 +126,7 @@ GameRenderer.prototype = {
         this.timeInput = document.createElement('input');
         this.timeInput.id = 'time-range';
         this.timeInput.type = 'date';
-        this.timeInput.value = this.startDate.toISOString().split('T')[0];
+        this.timeInput.value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
 
     },
 
@@ -129,16 +134,16 @@ GameRenderer.prototype = {
         this.weeksButton.addEventListener('click', () => {
             this.showByWeeks = true;
             let currentDate = new Date();
-            this.startDate = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
+            this.startDate = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay() - 1));
             // update main-table update
-            document.getElementById('time-range').value = this.startDate.toISOString().split('T')[0];
+            document.getElementById('time-range').value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
             document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
             document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
         });
         this.daysButton.addEventListener('click', () => {
             this.showByWeeks = false;
             this.startDate = new Date();
-            document.getElementById('time-range').value = this.startDate.toISOString().split('T')[0];
+            document.getElementById('time-range').value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
             document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
             document.getElementById('game-planner').appendChild(this._displayTableByDays());
         });
@@ -182,7 +187,7 @@ GameRenderer.prototype = {
                 this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() - 1));
             }
             
-            document.getElementById('time-range').value = this.startDate.toISOString().split('T')[0];
+            document.getElementById('time-range').value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
             // update main-table update
             document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
             if (this.showByWeeks == true) {
@@ -202,7 +207,7 @@ GameRenderer.prototype = {
                 this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() + 1));
             }
 
-            document.getElementById('time-range').value = this.startDate.toISOString().split('T')[0];
+            document.getElementById('time-range').value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
             // update main-table update
             document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
             if (this.showByWeeks == true) {
@@ -215,12 +220,12 @@ GameRenderer.prototype = {
         this.timeInput.addEventListener('change', () => {
             let changedTime = this.timeInput.value;
             let selectedDate = new Date(changedTime);
-            this.startDate = new Date(selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay()));
+            this.startDate = new Date(selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay() - 1));
 
             document.getElementById('game-planner').removeChild(document.getElementById('main-table'));
             if (this.showByWeeks == true) {
                 document.getElementById('game-planner').appendChild(this._displayTableByWeeks());
-                this.timeInput.value = this.startDate.toISOString().split('T')[0];
+                this.timeInput.value = new Date(this.startDate.getTime() - (this.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
             }
             else if (this.showByWeeks == false) {
                 document.getElementById('game-planner').appendChild(this._displayTableByDays());
@@ -401,7 +406,6 @@ GameRenderer.prototype = {
         removeButton.className = 'filter-remove btn btn-outline-danger btn-sm';
         removeButton.innerHTML = 'remove';
         removeButton.addEventListener('click', (e) => {
-            //console.log(e.target.parentElement.parentElement);
             e.target.parentElement.parentElement.removeChild(e.target.parentElement);
         });
 
@@ -543,6 +547,7 @@ GameRenderer.prototype = {
                 //eventDiv.style = height:" + (30*event.duration).toString() + ;
                 eventDiv.style.setProperty('height', (30*event.duration).toString() + 'px');
                 eventDiv.style.setProperty('left', (125*(j+1)).toString() + 'px');
+                eventDiv.style.setProperty('background-color', event.color);
                 players_h6 = document.createElement('h6');
                 players_h6.className = 'players';
                 players_h6.innerHTML = event.player1 + '<br>VS<br>' + event.player2;
