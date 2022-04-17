@@ -7,16 +7,13 @@ class Event {
         if ('duration' in options) {
             this.duration = options['duration'];
         }else{
-            this.duration = 5;
+            this.duration = 3;
         }
         if ('type' in options) {
             this.type = options['type'];
         }
         if ('location' in options) {
             this.location = options['location'];
-        }
-        if ('result' in options) {
-            this.result = options['result'];
         }
         if ('gamename' in options) {
             this.gamename = options['gamename'];
@@ -41,7 +38,7 @@ class Event {
 function GamePlanner() {
 	this.events = [];
     this.numberOfEvents = 0;
-    this.tableName = null;
+    this.tableName = 'Game Planner';
     this.latestTime = null;
     this.earliestTime = null;
 }
@@ -62,7 +59,6 @@ function GameRenderer(gamePlanner, container) {
     } else {
         this.startDate = currentDate;
     }
-    this.filterStatus = [];
     this._buildButtons();
     this._bindEvents();
 
@@ -84,11 +80,15 @@ GamePlanner.prototype = {
         }
 	},
 
+    getEventList: function() {
+        return this.events;
+    },
+
     removeEvent: function(eventID) {
-        let event;
-        for (event of this.events) {
-            if (event.eventID == eventID) {
-                this.events.remove(event);
+        for( let i = 0; i < this.events.length; i++){                      
+            if ( this.events[i].eventID == eventID) { 
+                this.events.splice(i, 1); 
+                break;
             }
         }
     },
@@ -173,7 +173,6 @@ GameRenderer.prototype = {
         this.filterButton.addEventListener('click', () => {
             this.filteredEventList = this.gamePlanner.events;
             let filterDiv = document.getElementById('filterDiv');
-            this.filterStatus = [];
             let li;
             for (li of filterDiv.children[0].children){
                 let operationSelect = li.getElementsByClassName('filter-operation')[0];
@@ -356,7 +355,54 @@ GameRenderer.prototype = {
                     result_list.push(event);
                 }
             }
-            //TODO: add more
+        }
+        this.filteredEventList = result_list;
+    },
+
+    _eventNotExist: function(variable, value){
+        let result_list = [];
+        let event;
+        for (event of this.filteredEventList){
+            if (variable == 'player') {
+                if (event.player1 == null || event.player2 == null){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'duration') {
+                if (event.duration == null){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'type') {
+                if (event.type == null){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'location') {
+                if (event.location == null){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'win') {
+                if (event.win == null){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'result-detail') {
+                if (event.resultdetail == null){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'detail') {
+                if (event.detail == null){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'gamename') {
+                if (event.gamename == null){
+                    result_list.push(event);
+                }
+            }
         }
         this.filteredEventList = result_list;
     },
@@ -371,7 +417,7 @@ GameRenderer.prototype = {
                 }
             }
             else if (variable == 'duration') {
-                if (event.duration == value){
+                if (event.duration.toString() == value){
                     result_list.push(event);
                 }
             }
@@ -419,7 +465,7 @@ GameRenderer.prototype = {
                 }
             }
             else if (variable == 'duration') {
-                if (event.duration != value){
+                if (event.duration.toString() != value){
                     result_list.push(event);
                 }
             }
@@ -457,12 +503,135 @@ GameRenderer.prototype = {
         this.filteredEventList = result_list;
     },
 
+    _eventContain: function(variable, value){
+        let result_list = [];
+        let event;
+        for (event of this.filteredEventList){
+            if (variable == 'player') {
+                if (event.player1.includes(value) || event.player2.includes(value)){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'duration') {
+                if (event.duration.toString().includes(value)){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'type') {
+                if (event.type){
+                    if (event.type.includes(value)){
+                        result_list.push(event);
+                    }
+                }
+            }
+            else if (variable == 'location') {
+                if (event.location){
+                    if (event.location.includes(value)){
+                        result_list.push(event);
+                    }
+                }
+            }
+            else if (variable == 'win') {
+                if (event.win){
+                    if (event.win.includes(value)){
+                        result_list.push(event);
+                    }
+                }
+            }
+            else if (variable == 'result-detail'){
+                if (event.resultdetail){
+                    if (event.resultdetail.includes(value)){
+                        result_list.push(event);
+                    }
+                }
+            }
+            else if (variable == 'detail'){
+                if (event.detail){
+                    if (event.detail.includes(value)){
+                        result_list.push(event);
+                    }
+                }
+            }
+            else if (variable == 'gamename') {
+                if (event.gamename){
+                    if (event.gamename.includes(value)){
+                        result_list.push(event);
+                    }
+                }
+            }
+        }
+        this.filteredEventList = result_list;
+    },
+
+    _eventNotContain: function(variable, value){
+        let result_list = [];
+        let event;
+        for (event of this.filteredEventList){
+            if (variable == 'player') {
+                if (!event.player1.includes(value) && !event.player2.includes(value)){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'duration') {
+                if (!event.duration.toString().includes(value)){
+                    result_list.push(event);
+                }
+            }
+            else if (variable == 'type') {
+                if (event.type){
+                    if (!event.type.includes(value)){
+                        result_list.push(event);
+                    }
+                }
+            }
+            else if (variable == 'location') {
+                if (event.location){
+                    if (!event.location.includes(value)){
+                        result_list.push(event);
+                    }
+                }
+            }
+            else if (variable == 'win') {
+                if (event.win){
+                    if (!event.win.includes(value)){
+                        result_list.push(event);
+                    }
+                }
+            }
+            else if (variable == 'result-detail'){
+                if (event.resultdetail){
+                    if (!event.resultdetail.includes(value)){
+                        result_list.push(event);
+                    }
+                }
+            }
+            else if (variable == 'detail'){
+                if (event.detail){
+                    if (!event.detail.includes(value)){
+                        result_list.push(event);
+                    }
+                }
+            }
+            else if (variable == 'gamename') {
+                if (event.gamename){
+                    if (!event.gamename.includes(value)){
+                        result_list.push(event);
+                    }
+                }
+            }
+        }
+        this.filteredEventList = result_list;
+    },
+
+
     _filterEvents: function(variable, value, operation){
-        this.filterStatus.push([variable, value, operation]);
         let event;
         for (event of this.filteredEventList){
             if (operation == 'exists'){
                 this._eventExists(variable, value);
+            }
+            if (operation == "doesn't exist"){
+                this._eventNotExist(variable, value);
             }
             else if (operation == 'is'){
                 this._eventIs(variable, value);
@@ -470,6 +639,13 @@ GameRenderer.prototype = {
             else if (operation == 'is not'){
                 this._eventIsNot(variable, value);
             }
+            else if (operation == 'contains'){
+                this._eventContain(variable, value);
+            }
+            else if (operation == "doesn't contain"){
+                this._eventNotContain(variable, value);
+            }
+
         }
     },
 
@@ -494,7 +670,7 @@ GameRenderer.prototype = {
         operationSelect = document.createElement('select');
         operationSelect.className = 'filter-operation';
         let operation;
-        for (operation of ['NA', 'exists', 'is', 'is not']){
+        for (operation of ['NA', 'exists', 'is', 'is not', "doesn't exist", 'contains', "doesn't contain"]){
             let operationOption = document.createElement('option');
             operationOption.innerHTML = operation;
             operationSelect.appendChild(operationOption);
@@ -539,14 +715,7 @@ GameRenderer.prototype = {
         filterDiv.id = 'filterDiv';
         let filterUl = document.createElement('ul');
         
-        if (this.filterStatus.length == 0){
-            filterUl.appendChild(this._createFilterLi(null));
-        }
-
-        let filterEle;
-        for (filterEle of this.filterStatus){
-            filterUl.appendChild(this._createFilterLi(filterEle));
-        }
+        filterUl.appendChild(this._createFilterLi());
         
         filterButtonsDiv = document.createElement('div');
         filterButtonsDiv.id = 'filterButtons';

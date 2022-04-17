@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Documentation</title>
+        <link rel="stylesheet" type="text/css" href="./developer-document.css">
+    </head>
+
+    <body>
+
+        <!-- Navigation Bar-->
+		<div class="NavigationBar">
+			<ul class="NavigationBackground">
+				<li class="HomePageButton">
+					<a href="index.html" class="NavigationText"> Main </a>
+				</li>
+				<li class="NavigationButton">
+					<a href="developer-document.html" class="NavigationText"> Documentation </a>
+				</li>
+				<li class="NavigationButton">
+					<a href="examples.html" class="NavigationText"> Example Page</a>
+				</li>
+                <li class="NavigationButton">
+					<a href="examples.js" class="NavigationText"> Example Code</a>
+				</li>
+                <li class="NavigationButton">
+					<a href="game-planner.js" class="NavigationText">Library Code</a>
+				</li>
+			</ul>
+		</div>
+
+        <!-- Title -->
+        <div class="Title">
+            <h1>Documentation</h1>
+        </div>
+
+        <div class="Content">
+
+            <h2>Getting Started</h2>
+            <p>
+                At first, you need to include this library and its style sheet in your html file.
+                <div class="CodeBackground2">
+                <code class="language-js">
+					<blockquote>&lt;script defer type="text/javascript" src="game-planner.js"&gt;&lt;/script&gt;</blockquote>
+                    <blockquote>&lt;link rel="stylesheet" type="text/css" href="game-planner.css"&gt;&lt;/link&gt;</blockquote>
+                    <blockquote>&lt;link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"&gt;&lt;/link&gt;</blockquote>
+				</code>
+                </div>
+            </p>
+            
+            <h2>JS Object Explaination - Event Object (Internal Object)</h2>
+            <table class="JSObject">
+                <tbody>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Default Value</th>
+                        <th>Required</th>
+                        <th>Note</th>
+                    </tr>
+                    <tr>
+                        <td>player1</td>
+                        <td>String</td>
+                        <td>one player of the game</td>
+                        <td>N/A</td>
+                        <td>true</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>player2</td>
+                        <td>String</td>
+                        <td>Another player of the game</td>
+                        <td>N/A</td>
+                        <td>true</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>startTime</td>
+                        <td>Date</td>
+                        <td>the event's start time</td>
+                        <td>N/A</td>
+                        <td>true</td>
+                        <td>When creating a Date object in js, month value starts from 0. AKA month for January is 0</td>
+                    </tr>
+                    <tr>
+                        <td>eventID</td>
+                        <td>Integer</td>
+                        <td>Unique id for each event</td>
+                        <td>N/A</td>
+                        <td>true</td>
+                        <td>eventID will be generated automatically during creation, and will be used when removing events</td>
+                    </tr>
+                    <tr>
+                        <td>duration</td>
+                        <td>Integer</td>
+                        <td>Duration of the event</td>
+                        <td>3</td>
+                        <td>true</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>type</td>
+                        <td>String</td>
+                        <td>Event type</td>
+                        <td>N/A</td>
+                        <td>false</td>
+                        <td>Eg. basketball, tennis</td>
+                    </tr>
+                    <tr>
+                        <td>location</td>
+                        <td>String</td>
+                        <td>Event Location</td>
+                        <td>N/A</td>
+                        <td>false</td>
+                        <td>Eg. Toronto</td>
+                    </tr>
+                    <tr>
+                        <td>gamename</td>
+                        <td>String</td>
+                        <td>Event Game Name</td>
+                        <td>N/A</td>
+                        <td>false</td>
+                        <td>Eg. NBA</td>
+                    </tr>
+                    <tr>
+                        <td>color</td>
+                        <td>String</td>
+                        <td>the color of this event block to be displayed</td>
+                        <td>#E0FFFF</td>
+                        <td>true</td>
+                        <td>must be in format '#xxxxxx'</td>
+                    </tr>
+                    <tr>
+                        <td>detail</td>
+                        <td>String</td>
+                        <td>Event Details, other information you want to include in the event to be displayed</td>
+                        <td>N/A</td>
+                        <td>false</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>win</td>
+                        <td>String</td>
+                        <td>The player name that wins the game</td>
+                        <td>N/A</td>
+                        <td>false</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>resultdetail</td>
+                        <td>String</td>
+                        <td>More result details you want to include in the event to be displayed</td>
+                        <td>N/A</td>
+                        <td>false</td>
+                        <td>N/A</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>JS Object Explaination - GamePlanner Object</h2>
+            <table class="JSObject">
+                <tbody>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Default Value</th>
+                        <th>Required</th>
+                        <th>Note</th>
+                    </tr>
+                    <tr>
+                        <td>events</td>
+                        <td>List[Event]</td>
+                        <td>A list of events that are will be displayed</td>
+                        <td>[]</td>
+                        <td>true</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>numberOfEvents</td>
+                        <td>Integer</td>
+                        <td>Number of events that have been added.</td>
+                        <td>0</td>
+                        <td>true</td>
+                        <td>For generating event ID. The number will not decrease when removing events.</td>
+                    </tr>
+                    <tr>
+                        <td>tableName</td>
+                        <td>String</td>
+                        <td>The game planner's title</td>
+                        <td>Game Planner</td>
+                        <td>true</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>latestTime</td>
+                        <td>Date</td>
+                        <td>The latest startTime of all events</td>
+                        <td>N/A</td>
+                        <td>false</td>
+                        <td>No need to input, library will calculate itself. 'null' when no event</td>
+                    </tr>
+                    <tr>
+                        <td>earliestTime</td>
+                        <td>Date</td>
+                        <td>The earliest startTime of all events</td>
+                        <td>N/A</td>
+                        <td>false</td>
+                        <td>No need to input, library will calculate itself. 'null' when no event</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>JS Object Explaination - GameRenderer Object</h2>
+            <table class="JSObject">
+                <tbody>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Default Value</th>
+                        <th>Required</th>
+                        <th>Note</th>
+                    </tr>
+                    <tr>
+                        <td>filterVariables</td>
+                        <td>List[String]</td>
+                        <td>a list filter variables included for users to filter events.</td>
+                        <td>['NA', 'player']</td>
+                        <td>true</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>filteredEventList</td>
+                        <td>[Event]</td>
+                        <td>A list of filtered events</td>
+                        <td>GamePlanner.events</td>
+                        <td>true</td>
+                        <td>Only support following values in list: 'NA', 'player', 'type', 'location', 'gamename', 'win', 'result-detail', 'detail', 'duration'</td>
+                    </tr>
+                    <tr>
+                        <td>container</td>
+                        <td>HTML Node</td>
+                        <td>The location where the table is added in a HTML file</td>
+                        <td>N/A</td>
+                        <td>true</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>gamePlanner</td>
+                        <td>GamePlanner</td>
+                        <td>GamePlanner object that includes all event data that will be displayed</td>
+                        <td>N/A</td>
+                        <td>true</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>showByWeeks</td>
+                        <td>Boolean</td>
+                        <td>if default display is the week table</td>
+                        <td>N/A</td>
+                        <td>true</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>startDate</td>
+                        <td>Date</td>
+                        <td>The startDate to display in the table. Will be the day to display for Day table, and the Sunday of displayed week for Week table</td>
+                        <td>Today for Day table, and Sunday for this week for Week table</td>
+                        <td>true</td>
+                        <td>Will be updated when input Date or click 'last' and 'next'</td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+            <h2>Constructor</h2>
+            <h3>new GamePlanner()</h3>
+            <p>
+                This function will create a Default GamePlanner. <br>
+                <div class="CodeBackground2">
+                <code class="language-js">
+					<blockquote>const gamePlanner = new GamePlanner();</blockquote>
+                    </code>
+                </div>
+                <br>
+            </p>
+            <h3>new GameRenderer(gamePlanner, container)</h3>
+            <p>
+                This function will create a Default GameRenderer, and the GameRenderer will display the table as a child of the container. <br>
+                <div class="CodeBackground2">
+                <code class="language-js">
+					<blockquote>let container = document.createElement('div');</blockquote>
+                    <blockquote>let gameRenderer = new GameRenderer(gamePlanner, container);</blockquote>
+                </code>
+                </div>
+                <br>
+            </p>
+
+            <h2>Common Methods</h2>
+            <h3>GamePlanner.setTableName(tableName)</h3>
+            <p> 
+                This function will set displayed table name. <br>
+                <b>tableName:</b> String, tableName is the title you want to set for the event planner table. The table name set will be shown at the top of the table. <br>
+                <br>
+                <div class="CodeBackground2">
+                <code class="language-js">
+					<blockquote>gamePlanner.setTableName('Example Game Event Planner');</blockquote>
+                </code>
+                </div>
+                <br>
+            </p>
+            <h3>GamePlanner.getEventList()</h3>
+            <p>
+                This function will get all events in the library <br>
+                <br>
+                <div class="CodeBackground2">
+                <code class="language-js">
+					<blockquote>gamePlanner.getEventList();</blockquote>
+                </code>
+                </div>
+                <br>
+            </p>
+
+            <h3>GamePlanner.addEvent(player1, player2, startTime, options)</h3>
+            <p>
+                This function will add an event to the library <br><br>
+                <b>player1:</b> String,  one player of the game <br>
+                <b>player2:</b> String,  another player of the game <br>
+                <b>startTime:</b> Date,  the event's start time <br>
+                <b>options:</b> Dict,  a dictionary that involves optional parameters (All following options.xxx are optional) <br>
+                <b>options.duration:</b> Integer,  duration of the event, default = 3 <br>
+                <b>options.type:</b> String,  the type of the event. Eg. tennis <br>
+                <b>options.location:</b> String,  the location of the event <br>
+                <b>options.gamename:</b> String,  game name of the event. Eg. NBA <br>
+                <b>options.detail:</b> String,  some additional information about this event. Eg. who holds this event, what is the more attracting point. <br>
+                <b>options.color:</b> String,  should be format '#xxxxxx', which decides the color of this event block to be displayed. Default = '#E0FFFF' <br>
+                <b>options.result:</b> Dict,  a dictionary that includes event result information, includes who wins and more details <br>
+                <b>options.result.win:</b> String,  the player that wins the event <br>
+                <b>options.result.detail:</b> String,  more details about the event result. Eg. detailed scores <br>
+
+                <br>
+                <div class="CodeBackground2">
+                <code class="language-js">
+					<blockquote>gamePlanner.addEvent('player1', 'player2', new Date(2022, 3, 16, 5, 0, 0, 0), {'type': 'tennis', 'location': 'toronto', 'gamename': 'atp', 'duration': 3, 'result': {'win': 'player1', 'detail': 'player1 wins 1,3,5 round'}, 'detail': 'Player1 and player2 are both really excellent tennis players, this match is a strong-strong fight'});</blockquote>
+                </code>
+                </div>
+                <br>
+            </p>
+
+            <h3>GamePlanner.removeEvent(eventID)</h3>
+            <p>
+                This function will remove event from library based on eventID (eventID will be auto-generated during creation) <br>
+                <b>eventID:</b> Integer, eventID of the event that we want to remove. <br>
+                <br>
+                <div class="CodeBackground2">
+                <code class="language-js">
+					<blockquote>gamePlanner.removeEvent(gamePlanner.getEventList()[0].eventID);</blockquote>
+                </code>
+                </div>
+                <br>
+            </p>
+
+
+            <h3>GameRenderer.addFilterVariables(filter_list)</h3>
+            <p>
+                This function will add filter variables that are for users to filter events. <br>
+                <br>
+                <b>filter_list:</b> List[String], a list filter variables included for users to filter events. Default filter_list=['NA', 'player']. Only support following values in list: 'NA', 'player', 'type', 'location', 'gamename', 'win', 'result-detail', 'detail', 'duration'<br>
+                <br>
+                <div class="CodeBackground2">
+                <code class="language-js">
+					<blockquote>gameRenderer.addFilterVariables(['type', 'location', 'gamename', 'win', 'result-detail', 'detail', 'duration']);</blockquote>
+                </code>
+                </div>
+                <br>
+            </p>
+
+            <h3>GameRenderer.removeFilterVariables(filter_list)</h3>
+            <p>
+                This function will remove filter variables that are for users to filter events. <br>
+                <b>filter_list:</b> List[String], filter variables to be removed for users to filter events. Only support following values in list: 'NA', 'player', 'type', 'location', 'gamename', 'win', 'result-detail', 'detail', 'duration'<br>
+                <br>
+                <div class="CodeBackground2">
+                <code class="language-js">
+					<blockquote>gameRenderer.removeFilterVariables(['type', 'location']);</blockquote>
+                </code>
+                </div>
+                <br>
+            </p>
+
+            <h3>GameRenderer.setTableType(showByWeeks)</h3>
+            <p>
+                This function decides if diplay Week Table by default.<br>
+                <b>showByWeeks:</b> Boolean, if we want to show the week table first. Default=true.<br>
+                <br>
+                <div class="CodeBackground2">
+                <code class="language-js">
+					<blockquote>gameRenderer.setTableType(true);</blockquote>
+                </code>
+                </div>
+                <br>
+            </p>
+
+            <h3>GameRender.display()</h3>
+            <p>
+                This function can display the final table based on previous setups..<br>
+                <br>
+                <div class="CodeBackground2">
+                <code class="language-js">
+					<blockquote>gameRenderer.display();</blockquote>
+                </code>
+                </div>
+                <br>
+            </p>
+        </div>
+
+    </body>
+
+</html>

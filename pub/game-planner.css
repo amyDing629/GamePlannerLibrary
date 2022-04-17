@@ -13,7 +13,6 @@
 #option-bar {
     width: 1000px;
     margin-left: 20px;
-    margin-bottom: 30px;
 
 }
 
@@ -133,10 +132,11 @@
 }
 
 .event-day-div{
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     margin-left: 170px;
     width: 700px;
     outline: 1px solid;
+    margin-top: 25px;
 
 }
 
