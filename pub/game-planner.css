@@ -228,3 +228,7 @@
 .close-button{
     margin-top: 10px;
 }
+
+#day-table{
+    position: relative;
+}
