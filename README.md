@@ -16,7 +16,7 @@ the container.
 1. They can see sport games event in a ‘Weekly’ and 'Daily' calendar table.
 2. The default table shown up is current week/today. They can flip pages by clicking ‘last’ and ‘next’ to see past and future events. The ‘Starts From: xxx’ will update as users flip pages or select Date directly. NOTE: when selecting date, 'Starts From' for Week table will show up as Sunday of the week, for Day table, it will be selected date. 
 3. Users can filter events by selecting variables that developers set for them,
-operators (including ‘exists’, 'doesn't exist', ‘is’, ‘is not’, 'contain', 'doesn't contain' for alpha phase), and typing in values in the text input. (NOTE: users don’t need to type in text input if they choose ‘exists’ as operators). They can also click ‘add filter’ if they want to add more filters for their events, or click ‘remove’ to remove extra filters.
+operators (including ‘exists’, 'doesn't exist', ‘is’, ‘is not’, 'contain', 'doesn't contain'), and typing in values in the text input. (NOTE: users don’t need to type in text input if they choose ‘exists’ as operators). They can also click ‘add filter’ if they want to add more filters for their events, or click ‘remove’ to remove extra filters.
 4. Users can change color of event block by clicking the color input besides the 'change color' text. NOTE: when changing color, all current filtered events' color will be changed (including events from other days or weeks). Both Week and Day table events' color will be updated.
 
 

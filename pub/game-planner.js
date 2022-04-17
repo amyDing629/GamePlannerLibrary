@@ -208,7 +208,6 @@ GameRenderer.prototype = {
             if (this.showByWeeks == true) {
                 this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() - 7));
             } 
-            // TODO for beta phase.
             else {
                 this.startDate = new Date(this.startDate.setDate(this.startDate.getDate() - 1));
             }
