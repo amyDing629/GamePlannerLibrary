@@ -12,7 +12,7 @@ they can input other optional parameters with in the ‘options’ dictionary.
 filters for their end users to filter events they want.
 4. They can display the Sports Game Planner in the place they want by passing in
 the container.
-- User Side:
+### User Side:
 1. They can see sport games event in a ‘Weekly’ and 'Daily' calendar table.
 2. The default table shown up is current week/today. They can flip pages by clicking ‘last’ and ‘next’ to see past and future events. The ‘Starts From: xxx’ will update as users flip pages or select Date directly. NOTE: when selecting date, 'Starts From' for Week table will show up as Sunday of the week, for Day table, it will be selected date. 
 3. Users can filter events by selecting variables that developers set for them,
@@ -21,11 +21,11 @@ operators (including ‘exists’, 'doesn't exist', ‘is’, ‘is not’, 'con
 
 
 # Links
-Landing Page: https://game-planner.herokuapp.com/
-Documentation Page: https://game-planner.herokuapp.com/developer-document.html
-Example Page: https://game-planner.herokuapp.com/examples.html
-Example Code: https://game-planner.herokuapp.com/examples.js
-Library Code: https://game-planner.herokuapp.com/game-planner.js
+## Landing Page: https://game-planner.herokuapp.com/
+## Documentation Page: https://game-planner.herokuapp.com/developer-document.html
+## Example Page: https://game-planner.herokuapp.com/examples.html
+## Example Code: https://game-planner.herokuapp.com/examples.js
+## Library Code: https://game-planner.herokuapp.com/game-planner.js
 
 # Copyright:
 This README.md is written by @YiyunDing
