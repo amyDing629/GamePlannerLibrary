@@ -26,6 +26,7 @@ operators (including ‘exists’, 'doesn't exist', ‘is’, ‘is not’, 'con
 ## Example Page: https://game-planner.herokuapp.com/examples.html
 ## Example Code: https://game-planner.herokuapp.com/examples.js
 ## Library Code: https://game-planner.herokuapp.com/game-planner.js
+## Demo Video on User Side: https://drive.google.com/file/d/1YhW82GnOLmsawWgDNKBaP2dOMFsHJmjm/view?usp=sharing
 
 # Copyright:
 This README.md is written by @YiyunDing
